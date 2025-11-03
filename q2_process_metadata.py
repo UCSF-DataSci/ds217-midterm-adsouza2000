@@ -1,103 +1,79 @@
-# TODO: Add shebang line: #!/usr/bin/env python3
-# Assignment 5, Question 2: Python Data Processing
-# Process configuration files for data generation.
+#!/usr/bin/env python3
 
+import random
 
+# Parse key=value config file into dictionary
 def parse_config(filepath: str) -> dict:
-    """
-    Parse config file (key=value format) into dictionary.
-
-    Args:
-        filepath: Path to q2_config.txt
-
-    Returns:
-        dict: Configuration as key-value pairs
-
-    Example:
-        >>> config = parse_config('q2_config.txt')
-        >>> config['sample_data_rows']
-        '100'
-    """
-    # TODO: Read file, split on '=', create dict
-    pass
+    config = {}
+    with open(filepath, 'r') as file:
+        for line in file:
+            line = line.strip()
+            if "=" in line:
+                key, value = line.split("=")
+                config[key.strip()] = int(value.strip())
+    return config
 
 
+# Validate configuration values
 def validate_config(config: dict) -> dict:
-    """
-    Validate configuration values using if/elif/else logic.
+    results = {}
 
-    Rules:
-    - sample_data_rows must be an int and > 0
-    - sample_data_min must be an int and >= 1
-    - sample_data_max must be an int and > sample_data_min
+    results['sample_data_rows'] = isinstance(config.get('sample_data_rows'), int) and config['sample_data_rows'] > 0
+    results['sample_data_min'] = isinstance(config.get('sample_data_min'), int) and config['sample_data_min'] >= 1
+    results['sample_data_max'] = isinstance(config.get('sample_data_max'), int) and config['sample_data_max'] > config['sample_data_min']
 
-    Args:
-        config: Configuration dictionary
-
-    Returns:
-        dict: Validation results {key: True/False}
-
-    Example:
-        >>> config = {'sample_data_rows': '100', 'sample_data_min': '18', 'sample_data_max': '75'}
-        >>> results = validate_config(config)
-        >>> results['sample_data_rows']
-        True
-    """
-    # TODO: Implement with if/elif/else
-    pass
+    return results
 
 
+# Generate random sample data
 def generate_sample_data(filename: str, config: dict) -> None:
-    """
-    Generate a file with random numbers for testing, one number per row with no header.
-    Uses config parameters for number of rows and range.
+    rows = config['sample_data_rows']
+    min_v = config['sample_data_min']
+    max_v = config['sample_data_max']
 
-    Args:
-        filename: Output filename (e.g., 'sample_data.csv')
-        config: Configuration dictionary with sample_data_rows, sample_data_min, sample_data_max
-
-    Returns:
-        None: Creates file on disk
-
-    Example:
-        >>> config = {'sample_data_rows': '100', 'sample_data_min': '18', 'sample_data_max': '75'}
-        >>> generate_sample_data('sample_data.csv', config)
-        # Creates file with 100 random numbers between 18-75, one per row
-        >>> import random
-        >>> random.randint(18, 75)  # Returns random integer between 18-75
-    """
-    # TODO: Parse config values (convert strings to int)
-    # TODO: Generate random numbers and save to file
-    # TODO: Use random module with config-specified range
-    pass
+    with open(filename, 'w') as file:
+        for _ in range(rows):
+            num = random.randint(min_v, max_v)
+            file.write(str(num) + "\n")
 
 
+# Calculate basic statistics
 def calculate_statistics(data: list) -> dict:
-    """
-    Calculate basic statistics.
+    count = len(data)
+    _sum = sum(data)
+    mean = _sum / count
 
-    Args:
-        data: List of numbers
+    sorted_data = sorted(data)
+    mid = count // 2
+    if count % 2 == 1:
+        median = sorted_data[mid]
+    else:
+        median = (sorted_data[mid - 1] + sorted_data[mid]) / 2
 
-    Returns:
-        dict: {mean, median, sum, count}
-
-    Example:
-        >>> stats = calculate_statistics([10, 20, 30, 40, 50])
-        >>> stats['mean']
-        30.0
-    """
-    # TODO: Calculate stats
-    pass
+    return {"count": count, "sum": _sum, "mean": mean, "median": median}
 
 
+# MAIN EXECUTION
 if __name__ == '__main__':
-    # TODO: Test your functions with sample data
-    # Example:
-    # config = parse_config('q2_config.txt')
-    # validation = validate_config(config)
-    # generate_sample_data('data/sample_data.csv', config)
-    # 
-    # TODO: Read the generated file and calculate statistics
-    # TODO: Save statistics to output/statistics.txt
-    pass
+    config = parse_config("q2_config.txt")
+    validation = validate_config(config)
+
+    print("Validation Results:", validation)
+
+    if not all(validation.values()):
+        print("❌ Invalid configuration. Please fix q2_config.txt")
+        exit(1)
+
+    data_file = "data/sample_data.csv"
+    generate_sample_data(data_file, config)
+
+    with open(data_file, 'r') as f:
+        nums = [int(x.strip()) for x in f.readlines()]
+
+    stats = calculate_statistics(nums)
+
+    with open("output/statistics.txt", "w") as f:
+        for key, value in stats.items():
+            f.write(f"{key}: {value}\n")
+
+    print("✅ Q2 complete! Sample data + statistics created.")

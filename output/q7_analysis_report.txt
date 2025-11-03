@@ -1,0 +1,14 @@
+
+Key Findings Report
+-------------------
+1. Site Summary:
+   - 5 sites analyzed.
+   - Age and BMI vary across sites (see q7_site_summary.csv for full stats).
+
+2. Intervention Group Comparison:
+   - Average Outcome_CVD and Adherence_Pct computed for each group.
+   - Results saved in q7_intervention_comparison.csv.
+
+3. Observations:
+   - Highest adherence observed in group: treatment b
+   - Lowest CVD rate observed in group: treatment a

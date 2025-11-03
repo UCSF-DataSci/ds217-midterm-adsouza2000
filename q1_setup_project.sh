@@ -15,3 +15,18 @@
 
 # TODO: Save the directory structure to reports/directory_structure.txt
 #       Hint: Use 'ls -la' or 'tree' command
+
+#!/bin/bash
+
+# Create directories
+mkdir -p data
+mkdir -p output
+mkdir -p reports
+
+# Generate dataset
+python3 generate_data.py
+
+# Save directory listing
+ls -R . > reports/directory_structure.txt
+
+
